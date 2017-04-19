@@ -19,7 +19,7 @@
 1. Review: ES6, Promises, & React
 2. Managing state w/o Redux
 3. Redux: Actions, Reducers, and Middleware
-4. Containers vs. Components
+4. Presentational vs. Container Components
 5. Refactoring with `react-redux`
 6. Async Redux with `redux-thunk`
 7. Selectors with `reselect`
@@ -80,6 +80,7 @@ Note:
 ### Why Redux
 
 * Huge ecosystem of middleware
+* Great dev tooling (time travel debugging)
 * Great documentation http://redux.js.org/
 * De facto choice for React state management
 * Well supported by other libraries/frameworks
@@ -126,9 +127,9 @@ Note:
 
 --
 
-## Updating State
+### Updating State with Actions
 
-* Redux state is never mutated directly
+* Redux state is read only
 * Changes are made via dispatched **actions**
 * Actions have a `type` property
 
@@ -140,10 +141,31 @@ store.dispatch({ type: 'DONE_LOADING' })
 store.dispatch({ type: 'UPDATE_SEARCH_TERM', payload: 'gener' })
 
 ```
+*Think of actions as the "breadcrumbs" of what's changed*
 
 --
 
-## Reducers
+### Action Creators
+
+* A factory that returns an action
+```js
+  // searchTermActions.js
+  function updateSearchTerm(searchTerm) {
+    return {
+      type: 'UPDATE_SEARCH_TERM',
+      payload: searchTerm,
+    };
+  }
+
+  // SearchComponent.js
+  store.dispatch(updateSearchTerm('gener'));
+```
+* Can be synchronous or asynchronous
+* Asynchronous requires use of middleware to dispatch other actions
+
+--
+
+### Reducers
 
 * Functions that decide how each action transforms the their respective piece of state
 * Each reducer maps to exactly 1 part of your state tree object
@@ -157,11 +179,17 @@ store.dispatch({ type: 'UPDATE_SEARCH_TERM', payload: 'gener' })
     userProfile: userProfileReducer,
   }
 ``` 
-* Reducers receive two arguments: the *current state* and the *dispatched action*
+* Receive two arguments: the *current state* and the *dispatched action*
+* Must be *pure functions*
+* Must be side-effect free
+
+Note:
+- Pure functions are ones that do not rely on outside state. For any given input, you'll always get the exact same output
+- Side-effects are things that affect state outside of the function, e.g. updating or reading from the DOM, ajax requests to the server, technically even console.logs but we can forgive that one
 
 --
 
-## Reducers
+### Reducers
 
 * Reducers **return new state** for their respective piece of the state tree object
 
@@ -187,6 +215,16 @@ function searchTermReducer(state = '', action) {
 }
 ```
 * **Note**: We are not changing state directly
+
+--
+
+### Why is it called a "reducer?"
+
+```js
+[1, 2, 3, 4].reduce((acc, value) => acc + value, 0);
+```
+
+"In Redux, the accumulated value is the state object, and the values being accumulated are actions. Reducers calculate a new state given the previous state and an action."
 
 --
 
@@ -252,7 +290,64 @@ const store = createStore(
 
 ---
 
-## Containers vs. Components
+## Presentational vs. Container Components
+
+--
+
+### Presentational Components
+
+* Concerned with how things *look*
+* Do not specify how the data is mutated or loaded
+* Are passed data and callbacks via `props`
+* Rarely use `state`
+* Typically written as functional component
+
+```js
+function Button(props) {
+  return (
+    <button className={props.className} onClick={props.onClickHandler}>
+      {props.children}
+    </button>
+  );
+}
+```
+
+--
+
+### Container Components
+* Concerned with things *work*
+* Typically don't contain any presentation (maybe just a `div`)
+* Pass down data and callbacks to other components as `props`
+* Callbacks include *action creators*
+* In Redux, created used `connect`
+
+```js
+function mapStateToProps(state) {
+  // ...
+}
+
+const NewsArchiveContainer = connect(mapStateToProps, { loadNews })(NewsArchive);
+
+```
+
+--
+
+### Architecture
+* App has many stateless presentational components
+* App contains a select number of container components that compose the different views
+* Container components wrap many presentational components
+
+```html
+<App>
+  <NewsContainer>
+    <News />
+    <SideBar />
+  </NewsContainer>
+  <UserProfileContainer>
+    <UserProfile />
+  </UserProfileContainer>
+</App>
+```
 
 ---
 
