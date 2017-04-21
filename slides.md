@@ -393,7 +393,7 @@ function Button(props) {
 
 --
 
-### `react-redux`
+### `react-redux` Container components
 
 * Official bindings for creating container components using React and Redux
 * Creates container using `connect` higher order function
@@ -409,7 +409,27 @@ function mapStateToProps(state) {
 const NewsArchiveContainer = connect(mapStateToProps, { loadNews })(NewsArchive);
 
 ```
+--
+### `react-redux` Provider
 
+* "Connected" Container components are exposed the `store` via `Provider`
+* Typically `Provider` wraps the top level of your app
+* Exposes `store` via React's `context`
+
+```html
+<Provider store={store}>
+  <Router>
+    <div className="App">
+      <AppHeader />
+      <div className="App-main">
+        <Route exact path="/" component={NewsArchiveContainer}/>
+        <Route path="/bookmarks" component={Bookmarks}/>
+        <Route path="/profile" component={Profile}/>
+      </div>
+    </div>
+  </Router>
+</Provider>
+```
 --
 
 ### Architecture
@@ -418,25 +438,36 @@ const NewsArchiveContainer = connect(mapStateToProps, { loadNews })(NewsArchive)
 * Container components wrap many presentational components
 
 ```html
-<App>
-  <NewsContainer>
-    <News />
-    <SideBar />
-  </NewsContainer>
-  <UserProfileContainer>
-    <UserProfile />
-  </UserProfileContainer>
-</App>
+<Provider store={store}>
+  <App>
+    <NewsContainer>
+      <News />
+      <SideBar />
+    </NewsContainer>
+    <UserProfileContainer>
+      <UserProfile />
+    </UserProfileContainer>
+  </App>
+</Provider>
 ```
 
 * Note: Container components do not need to be at the top of your tree.
 
 --
 
-## Code Along
-### Refactor to use presentational components
+## Code Along (Pt. 1)
+### Refactor `NewsArchive` to use container
 1. Create `NewsArchiveContainer` that passes down `news` and `loadNews`
-2. Create a ... FIXME...
+2. Refactor `NewsArchive` to call `loadNews` on `componentDidMount`
+3. Refactor `App` to a functional component that loads `NewsArchiveContainer` and wraps itself in `Provider`
+
+--
+
+## Code Along (Pt. 2)
+### Refactor `Search` to use a container
+1. Create `SearchContainer` that passes down `searchTerm` as `value` and custom binds the action creator `searchNews` to `onSearch`
+2. Create `SEARCH_NEWS` action, appropriate action creator, and reducers
+3. Update `App` to use the `SearchContainer` component
 
 ---
 
@@ -478,7 +509,7 @@ function loadNews() {
 
 ### Example: Dispatching a Promise
 
-<img src="img/redux-promise.png" style="max-height: 700px; border-width: 0; box-shadow: none;" />
+<a href="img/redux-promise.png" target="_new"><img src="img/redux-promise.png" style="max-height: 700px; border-width: 0; box-shadow: none;" /></a>
 
 --
 
@@ -512,6 +543,27 @@ function loadNews() {
 * Action creators return a function instead of an action object
 * Action creators are "thunks"
 * The returned function is executed by Redux Thunk middleware and passes the `dispach` function to the function
+
+--
+
+### What's a thunk?
+
+A thunk is a function that wraps an expression to delay its evaluation.
+
+```js
+// calculation of 1 + 2 is immediate
+// x === 3
+let x = 1 + 2;
+```
+```js
+// calculation of 1 + 2 is delayed
+// foo can be called later to perform the calculation
+// foo is a thunk!
+let foo = () => 1 + 2;
+```
+
+Note:
+- Code example from https://github.com/gaearon/redux-thunk
 
 --
 
