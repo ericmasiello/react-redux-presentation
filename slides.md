@@ -21,11 +21,8 @@
 3. Redux: Actions, Reducers
 4. Middleware as Dev Tools
 5. Presentational vs. Container Components
-6. Middleware for Async Actions
-
-
-7. Async Redux with `redux-thunk`
-8. Selectors with `reselect`
+6. Middleware for Async Actions with `redux-thunk`
+7. Selectors with `reselect`
 
 ---
 
@@ -443,7 +440,7 @@ const NewsArchiveContainer = connect(mapStateToProps, { loadNews })(NewsArchive)
 
 ---
 
-## Middleware for Async Actions
+## Middleware for Async Actions with `redux-thunk`
 
 --
 
