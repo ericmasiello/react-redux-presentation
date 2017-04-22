@@ -17,7 +17,7 @@
 ## Agenda
 
 1. Review: ES6, Promises, & React
-2. Managing state w/o Redux
+2. Managing state in React w/o Redux
 3. Redux: Actions, Reducers
 4. Middleware as Dev Tools
 5. Presentational vs. Container Components
@@ -28,17 +28,267 @@
 
 ## Review: ES6, Promises, & React
 
-(TODO)
+--
+
+### Arrow Functions (aka fat arrows)
+
+* Always anonymous
+* Bind `this` context to parent's `this`
+
+```js
+function (foo, bar) {
+  return foo + bar;
+}
+// or
+(foo, bar) => {
+  return foo + bar;
+}
+
+// or
+(foo, bar) => foo + bar;
+```
+
+--
+
+### Destructuring
+* Can be used on objects or arrays
+* Easy way to peal off props from an object
+* Easy to to extract values from an array 
+
+```js
+const list = ['a', 'b', 'c'];
+const person = {
+  firstName: 'Eric',
+  lastName: 'Masiello',
+  employer: 'Vistaprint Digital',
+};
+
+const [first, second] = list;
+// first === 'a'
+// second === 'b'
+
+const { firstName, lastName } = person;
+// firstName === 'Eric'
+// lastName === 'Masiello'
+```
+
+--
+### Rest Parameter
+* Can be used with arrays and function arguments
+* Applied using `...` before the variable
+
+```js
+const list = ['a', 'b', 'c'];
+
+const [first, ...everythingElse] = list;
+// first === 'a'
+// everythingElse contains ['b', 'c'];
+
+function foo(first, second, ...theRest) {
+  // first === 'c'
+  // second === 'c'
+  // theRest contains ['c', 'd', 'e']
+}
+foo('a', 'b', 'c', 'd', 'e');
+```
+
+--
+### Spread Operator
+
+* Takes the parts of an array and *spreads* them out
+* Also uses the `...` syntax
+
+```js
+const parts = ['shoulders', 'knees']; 
+const lyrics = ['head', ...parts, 'and', 'toes']; 
+// ["head", "shoulders", "knees", "and", "toes"]
+```
+* Can be used to copy the contents of an array
+
+```js
+const a = ['a', 'b', 'c'];
+const copyOfA = [...a];
+// a !== copyOfA (copies contents of array, not a pointer!)
+copyOfA.push('d');
+// a contains ['a', 'b', 'c']
+// copyOfA contains ['a', 'b', 'c', 'd']
+```
+
+--
+
+### Rest with Objects
+* **Disclaimer:** Currently requires Babel for support
+* Useful in React when dealing with `props`
+
+```js
+const person = {
+  firstName: 'Eric',
+  lastName: 'Masiello',
+  employer: 'Vistaprint Digital',
+};
+
+// Using Rest
+const { employer, ...nameProps } = person;
+// employer === 'Vistprint DigitalEric'
+// nameProps contains { firstName: 'Eric', lastName: 'Masiello' }
+```
+
+--
+
+### Using Rest with Objects in Function Parameters
+* **Disclaimer:** Currently requires Babel for support
+* Similar to object destructuring, the *keys* must match up
+
+```js
+function foo({ first, second, ...theRest }) {
+  // first === 'a',
+  // second === 'b',
+  // theRest contains { third: 'c', fourth: 'd' }
+}
+foo({
+  first: 'a',
+  second: 'b',
+  third: 'c',
+  fourth: 'd',
+});
+```
+
+--
+
+### Using Spread with Objects
+* **Disclaimer:** Currently requires Babel for support
+* Great for passing down `props` to React elements
+
+```js
+const headerProps = {
+  firstName: 'Eric',
+  lastName: 'Masiello',
+  className: 'vip',
+};
+
+return (
+  <div>
+    <Header {...headerProps} />
+  </div>
+);
+```
+
+--
+
+### Default function arguments
+Can set default value when argument is `undefined`
+
+```js
+function doStuff(list = [], filterBy = 'stuff') {
+
+}
+
+doStuff(); // list =[], filterBy = 'stuff'
+doStuff(['a', 'b']); // list = ['a', 'b'], filterBy = 'stuff'
+doStuff(undefined, 'things'); // list = [], filterBy = 'things'
+doStuff(null, null); // list = null, filterBy = null
+```
+Only works when value is `undefined` (not `null`)
+
+--
+
+### Promises
+* Similar to callbacks
+* Unlike callbacks, no "inversion of control"
+* Executed asynchronously when calling `.then()`
+
+```js
+const p = new Promise(function(resolve, reject) {
+  setTimeout(function() {
+    resolve('It works!');
+  }, 2000);
+});
+```
+
+--
+
+### More Promises
+* You *get* the result by calling `.then()`
+* Promises can be chained
+* Promises are also called "thenables"
+
+```js
+p.then((result) => {
+  // result === 'It works!';
+  return result + ' Hurray!';
+}).then((result) => {
+  console.log(result); // 'It works! Hurray!';
+});
+```
+
+--
+
+### Handling Errors with Promises
+Promises also have a `.catch()` method for handling erros in the promise chain
+
+```js
+const p = new Promise(function(resolve, reject) {
+  setTimeout(function() {
+    const error = new Error('Ah dang!');
+    reject(error);
+  }, 2000);
+});
+
+p.then((result) => {
+  console.log('it wont get here');
+}).catch((error) => {
+  console.error(error.message); // 'Ah dang!'
+});
+```
+
+--
+
+### React Components
+
+[CodePen Example](https://codepen.io/ericmasiello/pen/mmEwbq?editors=0010)
+
+```js
+// Class (stateful) component
+class Greeting extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { greeting: 'Hello' };
+    this.toggleGreeting = this.toggleGreeting.bind(this);
+  }
+  toggleGreeting() {
+    this.setState({
+      greeting: this.state.greeting === 'Hello' ? 'Bye' : 'Hello',
+    });
+  }
+  render() {
+    return (
+      <button onClick={this.toggleGreeting}>
+        {this.state.greeting}, {this.props.firstName}!
+      </button>
+    );
+  }
+}
+
+// Functional (stateless) Component
+function Header(props) {
+  return (
+    <div className="header">
+      <Greeting firstName="Eric" />
+    </div>
+  );
+}
+```
+
 
 ---
 
-## Managing state w/o Redux
+## Managing state in React w/o Redux
 
 --
 
 ### React `state`
 
-* `state` is often used as a data store for data
+* `state` is used as a data store for the app
 ```js
   constructor(props) {
     super(props);
@@ -48,7 +298,7 @@
     };
   }
 ```
-* Often spread across multiple components, each with their own `state`
+* It is often spread across multiple components, each with their own `state`
 
 --
 
@@ -82,7 +332,7 @@ Note:
 ### Why Redux
 
 * Huge ecosystem of middleware
-* Great dev tooling (time travel debugging)
+* Great dev tooling (e.g. time travel debugging)
 * Great documentation http://redux.js.org/
 * De facto choice for React state management
 * Well supported by other libraries/frameworks
