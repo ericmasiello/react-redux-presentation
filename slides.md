@@ -11,18 +11,40 @@
 * Co-Instructor for FEWD 31
 * Co-Author of Mastering React Native
 
+--
+
+### Buy Me :)
+
+<img src="img/mastering-react-native.png" style="max-height: 450px; border-width: 0; box-shadow: none;" />
+
+[Available on Amazon](https://www.amazon.com/Mastering-React-Native-Eric-Masiello/dp/1785885782/ref=sr_1_1?ie=UTF8&qid=1492862658&sr=8-1&keywords=mastering+react+native)
+
 
 ---
 
 ## Agenda
 
-1. Review: ES6, Promises, & React
-2. Managing state in React w/o Redux
-3. Redux: Actions, Reducers
-4. Middleware as Dev Tools
-5. Presentational vs. Container Components
-6. Middleware for Async Actions with `redux-thunk`
-7. Selectors with `reselect`
+1. Review: ES6, Promises, & React (25 mins)
+2. Managing state in React w/o Redux (25 mins)
+3. Redux: Actions, Reducers (25 mins)
+4. Middleware as Dev Tools (15 mins)
+5. Presentational vs. Container Components (30 mins)
+6. Middleware for Async Actions with `redux-thunk` (30 mins)
+7. Selectors with `reselect` (20 mins)
+
+---
+
+## Project Setup
+```bash
+# 1
+git clone https://github.com/ericmasiello/learn-redux.git
+# 2
+cd learn-redux
+# 3
+npm install
+# 4
+npm start
+```
 
 ---
 
@@ -109,6 +131,7 @@ const lyrics = ['head', ...parts, 'and', 'toes'];
 const a = ['a', 'b', 'c'];
 const copyOfA = [...a];
 // a !== copyOfA (copies contents of array, not a pointer!)
+
 copyOfA.push('d');
 // a contains ['a', 'b', 'c']
 // copyOfA contains ['a', 'b', 'c', 'd']
@@ -117,7 +140,6 @@ copyOfA.push('d');
 --
 
 ### Rest with Objects
-* **Disclaimer:** Currently requires Babel for support
 * Useful in React when dealing with `props`
 
 ```js
@@ -129,14 +151,14 @@ const person = {
 
 // Using Rest
 const { employer, ...nameProps } = person;
-// employer === 'Vistprint DigitalEric'
+// employer === 'Vistprint Digital'
 // nameProps contains { firstName: 'Eric', lastName: 'Masiello' }
 ```
+* **Disclaimer:** Currently requires Babel for support
 
 --
 
 ### Using Rest with Objects in Function Parameters
-* **Disclaimer:** Currently requires Babel for support
 * Similar to object destructuring, the *keys* must match up
 
 ```js
@@ -152,11 +174,11 @@ foo({
   fourth: 'd',
 });
 ```
+* **Disclaimer:** Currently requires Babel for support
 
 --
 
 ### Using Spread with Objects
-* **Disclaimer:** Currently requires Babel for support
 * Great for passing down `props` to React elements
 
 ```js
@@ -169,9 +191,16 @@ const headerProps = {
 return (
   <div>
     <Header {...headerProps} />
+    { /* both of these are doing the same thing */ }
+    <Header
+      firstName={headerProps.firstName}
+      lastName={headerProps.lastName}
+      className={headerProps.className}
+    />
   </div>
 );
 ```
+* **Disclaimer:** Currently requires Babel for support
 
 --
 
@@ -210,7 +239,6 @@ const p = new Promise(function(resolve, reject) {
 ### More Promises
 * You *get* the result by calling `.then()`
 * Promises can be chained
-* Promises are also called "thenables"
 
 ```js
 p.then((result) => {
@@ -224,7 +252,7 @@ p.then((result) => {
 --
 
 ### Handling Errors with Promises
-Promises also have a `.catch()` method for handling erros in the promise chain
+Promises also have a `.catch()` method for handling errors in the promise chain
 
 ```js
 const p = new Promise(function(resolve, reject) {
@@ -239,6 +267,21 @@ p.then((result) => {
 }).catch((error) => {
   console.error(error.message); // 'Ah dang!'
 });
+```
+
+--
+### `fetch`
+
+* Promise based API for making ajax requests
+* May require a polyfill in the browser
+* Must call `.json()` method on response
+
+```js
+fetch('/api/employees')
+  .then((response) => response.json())
+  .then((employees) => {
+    console.log(employees);
+  });
 ```
 
 --
@@ -278,7 +321,6 @@ function Header(props) {
   );
 }
 ```
-
 
 ---
 
@@ -350,7 +392,7 @@ Note:
 
 ### A single source of truth
 
-* The whole state of your app is stored in an object tree inside a single store.
+One object. One store.
 
 ```js
   {
@@ -379,6 +421,14 @@ Note:
 
 --
 
+### Redux Data Flow
+
+<img src="img/redux-data-flow.png" style="max-height: 450px; border-width: 0; box-shadow: none;" />
+
+*Note:* This does not account for middleware
+
+--
+
 ### Updating State with Actions
 
 * Redux state is read only
@@ -394,6 +444,8 @@ store.dispatch({ type: 'UPDATE_SEARCH_TERM', payload: 'gener' })
 
 ```
 *Think of actions as the "breadcrumbs" of what's changed*
+
+[See Flux Standard Actions](https://github.com/acdlite/flux-standard-action)
 
 --
 
@@ -420,6 +472,7 @@ store.dispatch({ type: 'UPDATE_SEARCH_TERM', payload: 'gener' })
 ### Reducers
 
 * Functions that decide how each action transforms the their respective piece of state
+* Must be *pure*, side-effect free functions
 * Each reducer maps to exactly 1 part of your state tree object
 
 ```js
@@ -430,10 +483,7 @@ store.dispatch({ type: 'UPDATE_SEARCH_TERM', payload: 'gener' })
     bookmarks: bookMarksReducer,
     userProfile: userProfileReducer,
   }
-``` 
-* Receive two arguments: the *current state* and the *dispatched action*
-* Must be *pure functions*
-* Must be side-effect free
+```
 
 Note:
 - Pure functions are ones that do not rely on outside state. For any given input, you'll always get the exact same output
@@ -468,6 +518,9 @@ function searchTermReducer(state = '', action) {
 ```
 * **Note**: We are not changing state directly
 
+Note:
+* Receive two arguments: the *current state* and the *dispatched action*
+
 --
 
 ### Why is it called a "reducer?"
@@ -500,7 +553,7 @@ const store = createStore(
 
 --
 
-## Listening for store updates
+### Listening for store updates
 
 * `subscribe` method from store allows you to listen for store updates
 
@@ -526,7 +579,7 @@ const store = createStore(
 
 --
 
-## Redux Data Flow
+### Recap: Redux Data Flow
 
 <img src="img/redux-data-flow.png" style="max-height: 450px; border-width: 0; box-shadow: none;" />
 
@@ -536,6 +589,13 @@ const store = createStore(
 
 ## Code Along
 ### Synchronous Data Flow
+```bash
+# Create a branch called "working"
+git checkout -b working
+# Reset to starting point "basic-promises"
+git reset --hard basic-promises
+```
+
 1. Add `redux`
 2. Create a `store` with a working `newsReducer`
 3. Create a `LOAD_NEWS` action and action creator (use `data.json`)
@@ -548,13 +608,16 @@ const store = createStore(
 --
 
 ## What is Redux Middleware
+```
+[dispatchedActions] => [middleware] => [reducers] => store
+```
 
 * Similar to Express middleware
-* Sits between your action creators and reducers
+* Sits between action creators and reducers
 * Can block or dispatch additional actions
 * Has full visibility into action and the state of your app
-* Can also be used to handle async actions (more on this later)
-* Are applied to the store using `applyMiddleware`
+* Can handle async actions (more on this later)
+* Applied to store using `applyMiddleware`
 
 --
 
@@ -570,6 +633,10 @@ Logs to your console...
 
 ## Code Along
 ### Add Redux Logger
+```bash
+git reset --hard add-redux
+```
+
 1. Install `redux-logger`
 2. Add it as middleware when calling `createStore` using `applyMiddleware`
 
@@ -600,7 +667,7 @@ https://github.com/zalmoxisus/redux-devtools-extension
 
 ---
 
-## Problem: We've added Redux, but we're still using `state`.
+### Problem: We've added Redux, but we're still using `state` as our data store.
 
 ---
 
@@ -614,7 +681,6 @@ https://github.com/zalmoxisus/redux-devtools-extension
 * Concerned with how things *look*
 * Do not specify how the data is mutated or loaded
 * Are passed data and callbacks via `props`
-* Rarely use `state`
 * Typically written as stateless/functional component
 
 ```js
@@ -643,10 +709,10 @@ function Button(props) {
 
 --
 
-### `react-redux` Container components
+### `react-redux` library
 
-* Official bindings for creating container components using React and Redux
-* Creates container using `connect` higher order function
+* Official bindings for creating container components for React with Redux
+* Creates containers using `connect` higher order function
 * Autowraps action creators with `dispatch`
 
 ```js
@@ -656,15 +722,15 @@ function mapStateToProps(state) {
   };
 }
 
-const NewsArchiveContainer = connect(mapStateToProps, { loadNews })(NewsArchive);
+const NewsContainer = connect(mapStateToProps, { loadNews })(News);
 
 ```
 --
-### `react-redux` Provider
+### `react-redux` 
+#### Provider
 
-* "Connected" Container components are exposed the `store` via `Provider`
-* Typically `Provider` wraps the top level of your app
-* Exposes `store` via React's `context`
+* Typically `Provider` wraps your entire app
+* Exposes `store` to containers via React's `context`
 
 ```html
 <Provider store={store}>
@@ -683,9 +749,8 @@ const NewsArchiveContainer = connect(mapStateToProps, { loadNews })(NewsArchive)
 --
 
 ### Architecture
-* App has many presentational components
-* App contains a select number of container components that compose the different views
-* Container components wrap many presentational components
+
+A few container components wrap many presentational components
 
 ```html
 <Provider store={store}>
@@ -705,16 +770,20 @@ const NewsArchiveContainer = connect(mapStateToProps, { loadNews })(NewsArchive)
 
 --
 
-## Code Along (Pt. 1)
-### Refactor `NewsArchive` to use container
+### Code Along (Pt. 1)
+#### Refactor `NewsArchive` to use a container
+```bash
+git reset --hard add-redux-logger
+```
+
 1. Create `NewsArchiveContainer` that passes down `news` and `loadNews`
 2. Refactor `NewsArchive` to call `loadNews` on `componentDidMount`
 3. Refactor `App` to a functional component that loads `NewsArchiveContainer` and wraps itself in `Provider`
 
 --
 
-## Code Along (Pt. 2)
-### Refactor `Search` to use a container
+### Code Along (Pt. 2)
+#### Refactor `Search` to use a container
 1. Create `SearchContainer` that passes down `searchTerm` as `value` and custom binds the action creator `searchNews` to `onSearch`
 2. Create `SEARCH_NEWS` action, appropriate action creator, and reducers
 3. Update `App` to use the `SearchContainer` component
@@ -728,6 +797,9 @@ const NewsArchiveContainer = connect(mapStateToProps, { loadNews })(NewsArchive)
 ### The Basic Middleware Flow
 
 Redux out of the box only works synchronously
+```
+[dispatchedActions] => [middleware] => [reducers] => store
+```
 
 1. Action creators return actions
 2. Actions flow through middleware
@@ -819,6 +891,9 @@ Note:
 
 ### Code Along
 #### Add Redux Thunk
+```bash
+git reset --hard add-react-redux
+```
 
 1. Install and apply `redux-thunk` middleware
 2. Remove `data.json` and load the data using `nytFetch` and a thunk
@@ -843,15 +918,27 @@ Note:
 #### Basic Input Selectors
 * Functions that return data from Redux state
 * Must not transform data
+```js
+  const searchTermSelector = state => state.searchTerm;
+```
 
+--
+
+### Types of Selectors
 #### Memoized Selectors
 * Created using `createSelector`
 * Take basic selectors as inputs
 * Return combined state to components
+```js
+  const caseInsensitiveSearchTermSelector = createSelector(
+    [searchTermSelector],
+    searchTerm => searchTerm.toLowerCase()
+);
+```
 
 --
 
-### Selectors
+### Example
 
 ```js
 const newsSelector = state => state.news;
@@ -874,6 +961,9 @@ export const searchNewsSelector = createSelector(
 --
 
 ## Code Along
+```bash
+git reset --hard add-redux-thunk
+```
 1. Install `reselect`
 2. Create news selectors that make it possible to search the news
 3. Pass filtered `news` to `NewsArchive` as props
