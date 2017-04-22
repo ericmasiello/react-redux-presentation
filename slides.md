@@ -3,7 +3,7 @@
 
 ---
 
-## About Eric
+## About me
 
 * @ericmasiello
 * eric.j.masiello@gmail.com
@@ -23,6 +23,7 @@
 ---
 
 ## Agenda
+#### (Please help me keep time)
 
 1. Review: ES6, Promises, & React (25 mins)
 2. Managing state in React w/o Redux (25 mins)
@@ -324,6 +325,16 @@ function Header(props) {
 
 ---
 
+### Let's review the current app
+
+```bash
+# Create a branch called "working"
+git checkout -b working
+# Reset to starting point "basic-promises"
+git reset --hard basic-promises
+```
+---
+
 ## Managing state in React w/o Redux
 
 --
@@ -589,10 +600,8 @@ const store = createStore(
 
 ## Code Along
 ### Synchronous Data Flow
+
 ```bash
-# Create a branch called "working"
-git checkout -b working
-# Reset to starting point "basic-promises"
 git reset --hard basic-promises
 ```
 
@@ -607,7 +616,7 @@ git reset --hard basic-promises
 
 --
 
-## What is Redux Middleware
+### What is Redux Middleware
 ```
 [dispatchedActions] => [middleware] => [reducers] => store
 ```
@@ -621,7 +630,7 @@ git reset --hard basic-promises
 
 --
 
-## Redux Logger
+### Redux Logger
 
 Logs to your console...
 
@@ -631,8 +640,8 @@ Logs to your console...
 
 --
 
-## Code Along
-### Add Redux Logger
+### Code Along
+#### Add Redux Logger
 ```bash
 git reset --hard add-redux
 ```
@@ -642,7 +651,7 @@ git reset --hard add-redux
 
 --
 
-## Redux DevTools
+### Redux DevTools
 
 https://github.com/zalmoxisus/redux-devtools-extension
 
@@ -653,14 +662,14 @@ https://github.com/zalmoxisus/redux-devtools-extension
 
 --
 
-## Word of Caution
+### Word of Caution
 
 *You'll likely want to strip out Redux DevTools and Redux Logger in production*
 
 --
 
-## Code Along
-### Configure Redux DevTools
+### Code Along
+#### Configure Redux DevTools
 
 1. Install the Chrome Extension https://chrome.google.com/webstore/detail/redux-devtools/lmhkpmbekcpmknklioeibfkpmmfibljd
 2. Add the Redux DevTools as the composer
@@ -808,7 +817,7 @@ Redux out of the box only works synchronously
 
 --
 
-### Action Creators + Middlware sitting in a tree
+### Action Creators + Middleware sittin' in a tree
 
 * Action creators can return other data types (e.g. functions, promises, etc.)
 * Middleware can inspect these "actions", stop them from passing to the reducers, and operate on them.
