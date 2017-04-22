@@ -289,21 +289,12 @@ fetch('/api/employees')
 
 ### React Components
 
-[CodePen Example](https://codepen.io/ericmasiello/pen/mmEwbq?editors=0010)
+[See CodePen Example](https://codepen.io/ericmasiello/pen/mmEwbq?editors=0010)
 
 ```js
 // Class (stateful) component
 class Greeting extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { greeting: 'Hello' };
-    this.toggleGreeting = this.toggleGreeting.bind(this);
-  }
-  toggleGreeting() {
-    this.setState({
-      greeting: this.state.greeting === 'Hello' ? 'Bye' : 'Hello',
-    });
-  }
+  // more stuff goes here ...
   render() {
     return (
       <button onClick={this.toggleGreeting}>
@@ -312,15 +303,12 @@ class Greeting extends React.Component {
     );
   }
 }
-
 // Functional (stateless) Component
-function Header(props) {
-  return (
-    <div className="header">
-      <Greeting firstName="Eric" />
-    </div>
-  );
-}
+const Header = (props) => (
+  <div className="header">
+    <Greeting firstName="Eric" />
+  </div>
+);
 ```
 
 ---
