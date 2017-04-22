@@ -37,13 +37,21 @@
 
 ## Project Setup
 ```bash
-# 1
+# 1. clone the repo and step into the directory
 git clone https://github.com/ericmasiello/learn-redux.git
-# 2
 cd learn-redux
-# 3
+
+# 2. switch to the last branch
+# (yes I made a typo in the branch name, sorry!)
+git checkout add-reslect
+
+# 3. install all the dependencies this project will need
 npm install
-# 4
+
+# 4. switch back to master
+git checkout master
+
+# 5. run the app on http://localhost:3000/
 npm start
 ```
 
