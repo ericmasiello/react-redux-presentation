@@ -313,7 +313,7 @@ class Greeting extends React.Component {
 // Functional (stateless) Component
 const Header = (props) => (
   <div className="header">
-    <Greeting firstName="Eric" />
+    <Greeting firstName={props.name} />
   </div>
 );
 ```
