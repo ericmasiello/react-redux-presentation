@@ -3,333 +3,6 @@
 
 ---
 
-## About me
-
-* @ericmasiello
-* eric.j.masiello@gmail.com
-* Fullstack JavaScript Engineer @ Vistaprint Digital
-* Co-Instructor for FEWD 31
-* Co-Author of Mastering React Native
-
---
-
-### Buy Me :)
-
-<img src="img/mastering-react-native.png" style="max-height: 450px; border-width: 0; box-shadow: none;" />
-
-<a target="_blank" href="https://www.amazon.com/gp/product/1785885782/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=1785885782&linkCode=as2&tag=ericmasiello-20&linkId=0b797f6960a050d6567fd26505307fec">Mastering React Native</a><img src="//ir-na.amazon-adsystem.com/e/ir?t=ericmasiello-20&l=am2&o=1&a=1785885782" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" />
-
----
-
-## Agenda
-#### (Please help me keep time)
-
-1. Review: ES6, Promises, & React (25 mins)
-2. Managing state in React w/o Redux (25 mins)
-3. Redux: Actions, Reducers (25 mins)
-4. Middleware as Dev Tools (15 mins)
-5. Presentational vs. Container Components (30 mins)
-6. Middleware for Async Actions with `redux-thunk` (30 mins)
-7. Selectors with `reselect` (20 mins)
-
----
-
-## Project Setup
-```bash
-# 1. clone the repo and step into the directory
-git clone https://github.com/ericmasiello/learn-redux.git
-cd learn-redux
-
-# 2. switch to the last branch
-# (yes I made a typo in the branch name, sorry!)
-git checkout add-reslect
-
-# 3. install all the dependencies this project will need
-npm install
-
-# 4. switch back to master
-git checkout master
-
-# 5. run the app on http://localhost:3000/
-npm start
-```
-
----
-
-## Review: ES6, Promises, & React
-
---
-
-### Arrow Functions (aka fat arrows)
-
-* Always anonymous
-* Bind `this` context to parent's `this`
-
-```js
-function (foo, bar) {
-  return foo + bar;
-}
-// or
-(foo, bar) => {
-  return foo + bar;
-}
-
-// or
-(foo, bar) => foo + bar;
-```
-
---
-
-### Destructuring
-* Can be used on objects or arrays
-* Easy way to peal off props from an object
-* Easy to to extract values from an array 
-
-```js
-const list = ['a', 'b', 'c'];
-const person = {
-  firstName: 'Eric',
-  lastName: 'Masiello',
-  employer: 'Vistaprint Digital',
-};
-
-const [first, second] = list;
-// first === 'a'
-// second === 'b'
-
-const { firstName, lastName } = person;
-// firstName === 'Eric'
-// lastName === 'Masiello'
-```
-
---
-### Rest Parameter
-* Can be used with arrays and function arguments
-* Applied using `...` before the variable
-
-```js
-const list = ['a', 'b', 'c'];
-
-const [first, ...everythingElse] = list;
-// first === 'a'
-// everythingElse contains ['b', 'c'];
-
-function foo(first, second, ...theRest) {
-  // first === 'c'
-  // second === 'c'
-  // theRest contains ['c', 'd', 'e']
-}
-foo('a', 'b', 'c', 'd', 'e');
-```
-
---
-### Spread Operator
-
-* Takes the parts of an array and *spreads* them out
-* Also uses the `...` syntax
-
-```js
-const parts = ['shoulders', 'knees']; 
-const lyrics = ['head', ...parts, 'and', 'toes']; 
-// ["head", "shoulders", "knees", "and", "toes"]
-```
-* Can be used to copy the contents of an array
-
-```js
-const a = ['a', 'b', 'c'];
-const copyOfA = [...a];
-// a !== copyOfA (copies contents of array, not a pointer!)
-
-copyOfA.push('d');
-// a contains ['a', 'b', 'c']
-// copyOfA contains ['a', 'b', 'c', 'd']
-```
-
---
-
-### Rest with Objects
-* Useful in React when dealing with `props`
-
-```js
-const person = {
-  firstName: 'Eric',
-  lastName: 'Masiello',
-  employer: 'Vistaprint Digital',
-};
-
-// Using Rest
-const { employer, ...nameProps } = person;
-// employer === 'Vistprint Digital'
-// nameProps contains { firstName: 'Eric', lastName: 'Masiello' }
-```
-* **Disclaimer:** Currently requires Babel for support
-
---
-
-### Using Rest with Objects in Function Parameters
-* Similar to object destructuring, the *keys* must match up
-
-```js
-function foo({ first, second, ...theRest }) {
-  // first === 'a',
-  // second === 'b',
-  // theRest contains { third: 'c', fourth: 'd' }
-}
-foo({
-  first: 'a',
-  second: 'b',
-  third: 'c',
-  fourth: 'd',
-});
-```
-* **Disclaimer:** Currently requires Babel for support
-
---
-
-### Using Spread with Objects
-* Great for passing down `props` to React elements
-
-```js
-const headerProps = {
-  firstName: 'Eric',
-  lastName: 'Masiello',
-  className: 'vip',
-};
-
-return (
-  <div>
-    <Header {...headerProps} />
-    { /* both of these are doing the same thing */ }
-    <Header
-      firstName={headerProps.firstName}
-      lastName={headerProps.lastName}
-      className={headerProps.className}
-    />
-  </div>
-);
-```
-* **Disclaimer:** Currently requires Babel for support
-
---
-
-### Default function arguments
-Can set default value when argument is `undefined`
-
-```js
-function doStuff(list = [], filterBy = 'stuff') {
-
-}
-
-doStuff(); // list =[], filterBy = 'stuff'
-doStuff(['a', 'b']); // list = ['a', 'b'], filterBy = 'stuff'
-doStuff(undefined, 'things'); // list = [], filterBy = 'things'
-doStuff(null, null); // list = null, filterBy = null
-```
-Only works when value is `undefined` (not `null`)
-
---
-
-### Promises
-* Similar to callbacks
-* Unlike callbacks, no "inversion of control"
-* Executed asynchronously when calling `.then()`
-
-```js
-const p = new Promise(function(resolve, reject) {
-  setTimeout(function() {
-    resolve('It works!');
-  }, 2000);
-});
-```
-
---
-
-### More Promises
-* You *get* the result by calling `.then()`
-* Promises can be chained
-
-```js
-p.then((result) => {
-  // result === 'It works!';
-  return result + ' Hurray!';
-}).then((result) => {
-  console.log(result); // 'It works! Hurray!';
-});
-```
-
---
-
-### Handling Errors with Promises
-Promises also have a `.catch()` method for handling errors in the promise chain
-
-```js
-const p = new Promise(function(resolve, reject) {
-  setTimeout(function() {
-    const error = new Error('Ah dang!');
-    reject(error);
-  }, 2000);
-});
-
-p.then((result) => {
-  console.log('it wont get here');
-}).catch((error) => {
-  console.error(error.message); // 'Ah dang!'
-});
-```
-
---
-### `fetch`
-
-* Promise based API for making ajax requests
-* May require a polyfill in the browser
-* Must call `.json()` method on response
-
-```js
-fetch('/api/employees')
-  .then((response) => response.json())
-  .then((employees) => {
-    console.log(employees);
-  });
-```
-
---
-
-### React Components
-
-[See CodePen Example](https://codepen.io/ericmasiello/pen/mmEwbq?editors=0010)
-
-```js
-// Class (stateful) component
-class Greeting extends React.Component {
-  // more stuff goes here ...
-  render() {
-    return (
-      <button onClick={this.toggleGreeting}>
-        {this.state.greeting}, {this.props.firstName}!
-      </button>
-    );
-  }
-}
-// Functional (stateless) Component
-const Header = (props) => (
-  <div className="header">
-    <Greeting firstName={props.name} />
-  </div>
-);
-```
-
----
-
-### Let's review the current app
-
-```bash
-# Create a branch called "working"
-git checkout -b working
-# Reset to starting point "basic-promises"
-git reset --hard basic-promises
-```
----
-
 ## Managing state in React w/o Redux
 
 --
@@ -341,7 +14,7 @@ git reset --hard basic-promises
   constructor(props) {
     super(props);
     this.state = {
-      news: [],
+      todos: [],
       searchTerm: '',
     };
   }
@@ -403,8 +76,8 @@ One object. One store.
 ```js
   {
     isLoading: false,
-    news: [{}, {}, {}],
-    searchTerm: 'general assembly',
+    todos: [{}, {}, {}],
+    searchTerm: 'vistaprint digital',
     bookmarks: [733, 522, 28],
     userProfile: {
       firstName: 'Eric',
@@ -477,14 +150,14 @@ store.dispatch({ type: 'UPDATE_SEARCH_TERM', payload: 'gener' })
 
 ### Reducers
 
-* Functions that decide how each action transforms the their respective piece of state
+* Functions that decide how each action transforms their respective piece of state
 * Must be *pure*, side-effect free functions
 * Each reducer maps to exactly 1 part of your state tree object
 
 ```js
   {
     isLoading: loadingReducer,
-    news: newsReducer,
+    todos: todosReducer,
     searchTerm: searchTermReducer,
     bookmarks: bookMarksReducer,
     userProfile: userProfileReducer,
@@ -502,23 +175,16 @@ Note:
 * Reducers **return new state** for their respective piece of the state tree object
 
 ```js
-function loadingReducer(state = false, action) {
-  switch (action.type) {
-  case 'IS_LOADING':
-    return true;
-  case 'DONE_LOADING':
-    return false;
-  default:
-    return state;
-  }
-}
-
-function searchTermReducer(state = '', action) {
-  switch (action.type) {
-  case 'UPDATE_SEARCH_TERM':
-    return action.payload;
-  default:
-    return state;
+function todoReducer(state = [], action) {
+  switch(action.type) {
+    case: 'ADD_TODO':
+      // creates new array, adds todo at the end
+      return [...state, action.payload],
+    case: 'REMOVE_TODO':
+      // creates new array filtering out matching todo by id
+      return state.filter(todo => todo.id !== action.payload);
+    default:
+      return state;
   }
 }
 ```
@@ -547,7 +213,7 @@ import { createStore, combineReducers, applyMiddleware } from 'redux';
 const store = createStore(
   combineReducers({
     isLoading: loadingReducer,
-    news: newsReducer,
+    todos: todosReducer,
     searchTerm: searchTermReducer,
     bookmarks: bookMarksReducer,
     userProfile: userProfileReducer,
@@ -562,13 +228,14 @@ const store = createStore(
 ### Listening for store updates
 
 * `subscribe` method from store allows you to listen for store updates
+* _Note_: We'll use `react-redux` to manage this
 
 ```js
   constructor(props) {
     super(props);
     this.state = {
       isLoading: false,
-      news: [],
+      todos: [],
       searchTerm: '',
       bookmarks: [],
       userProfile: {},
@@ -590,20 +257,6 @@ const store = createStore(
 <img src="img/redux-data-flow.png" style="max-height: 450px; border-width: 0; box-shadow: none;" />
 
 *Note:* This does not account for middleware
-
---
-
-## Code Along
-### Synchronous Data Flow
-
-```bash
-git reset --hard basic-promises
-```
-
-1. Add `redux`
-2. Create a `store` with a working `newsReducer`
-3. Create a `LOAD_NEWS` action and action creator (use `data.json`)
-4. Dispatch the `LOAD_NEWS` action in place of `nytFetch('technology')`
 
 ---
 
@@ -635,17 +288,6 @@ Logs to your console...
 
 --
 
-### Code Along
-#### Add Redux Logger
-```bash
-git reset --hard add-redux
-```
-
-1. Install `redux-logger`
-2. Add it as middleware when calling `createStore` using `applyMiddleware`
-
---
-
 ### Redux DevTools
 
 https://github.com/zalmoxisus/redux-devtools-extension
@@ -660,18 +302,6 @@ https://github.com/zalmoxisus/redux-devtools-extension
 ### Word of Caution
 
 *You'll likely want to strip out Redux DevTools and Redux Logger in production*
-
---
-
-### Code Along
-#### Configure Redux DevTools
-
-1. Install the Chrome Extension https://chrome.google.com/webstore/detail/redux-devtools/lmhkpmbekcpmknklioeibfkpmmfibljd
-2. Add the Redux DevTools as the composer
-
----
-
-### Problem: We've added Redux, but we're still using `state` as our data store.
 
 ---
 
@@ -709,7 +339,7 @@ function Button(props) {
 
 ### Primary Benefits of this Approach
 1. Separation of concerns: UI (Presentation) vs. Data
-2. Easier to make reusable UI components
+2. Easier to make UI components reusable
 
 --
 
@@ -722,11 +352,12 @@ function Button(props) {
 ```js
 function mapStateToProps(state) {
   return {
-    news: state.news,
+    todos: state.todos,
   };
 }
 
-const NewsContainer = connect(mapStateToProps, { loadNews })(News);
+const TodosContainer = 
+  connect(mapStateToProps, { addTodo, toggleTodo })(Todos);
 
 ```
 --
@@ -742,9 +373,9 @@ const NewsContainer = connect(mapStateToProps, { loadNews })(News);
     <div className="App">
       <AppHeader />
       <div className="App-main">
-        <Route exact path="/" component={NewsArchiveContainer}/>
-        <Route path="/bookmarks" component={Bookmarks}/>
-        <Route path="/profile" component={Profile}/>
+        <Route exact path="/" component={TodoListContainer}/>
+        <Route path="/bookmarks" component={BookmarksContainer}/>
+        <Route path="/profile" component={UserProfileContainer}/>
       </div>
     </div>
   </Router>
@@ -759,10 +390,10 @@ A few container components wrap many presentational components
 ```html
 <Provider store={store}>
   <App>
-    <NewsContainer>
-      <News />
+    <TodoListContainer>
+      <TodoList />
       <SideBar />
-    </NewsContainer>
+    </TodoListContainer>
     <UserProfileContainer>
       <UserProfile />
     </UserProfileContainer>
@@ -771,26 +402,6 @@ A few container components wrap many presentational components
 ```
 
 * Note: Container components do not need to be at the top of your tree.
-
---
-
-### Code Along (Pt. 1)
-#### Refactor `NewsArchive` to use a container
-```bash
-git reset --hard add-redux-logger
-```
-
-1. Create `NewsArchiveContainer` that passes down `news` and `loadNews`
-2. Refactor `NewsArchive` to call `loadNews` on `componentDidMount`
-3. Refactor `App` to a functional component that loads `NewsArchiveContainer` and wraps itself in `Provider`
-
---
-
-### Code Along (Pt. 2)
-#### Refactor `Search` to use a container
-1. Create `SearchContainer` that passes down `searchTerm` as `value` and custom binds the action creator `searchNews` to `onSearch`
-2. Create `SEARCH_NEWS` action, appropriate action creator, and reducers
-3. Update `App` to use the `SearchContainer` component
 
 ---
 
@@ -823,10 +434,10 @@ Redux out of the box only works synchronously
 #### Using `redux-promise`
 
 ```js
-function loadNews() {
+function loadTodosFromServer() {
   return {
-    type: LOAD_NEWS,
-    payload: nytFetch('technology'), // <-- Ooo! A Promise!
+    type: LOAD_TODOS,
+    payload: fetch('/todos'), // <-- Ooo! A Promise!
   };
 }
 ```
@@ -843,20 +454,21 @@ function loadNews() {
 #### Using `redux-thunk`
 
 ```js
-function loadNews() {
+function loadTodosFromServer() {
   return function(dispatch) {
     // dispatch something to let our UI know its fetching data
     dispatch({
       type: IS_LOADING,
     });
 
-    nytFetch('technology')
-    .then(news => {
+    return fetch('/todos')
+    .then(res => res.json())
+    .then(todos => {
       // When the data returns, dispatch
       // another action with the data in tact
       dispatch({
-        type: LOAD_NEWS,
-        payload: news,
+        type: LOAD_TODOS,
+        payload: todos,
       });
     });
   }
@@ -891,19 +503,6 @@ let foo = () => 1 + 2;
 Note:
 - Code example from https://github.com/gaearon/redux-thunk
 
---
-
-### Code Along
-#### Add Redux Thunk
-```bash
-git reset --hard add-react-redux
-```
-
-1. Install and apply `redux-thunk` middleware
-2. Remove `data.json` and load the data using `nytFetch` and a thunk
-3. add `isLoading` to the state tree along w/ a reducer
-4. Update `NewsArchive` to display "Loading..." when appropriate
-
 ---
 
 ## Selectors with `reselect`
@@ -923,7 +522,8 @@ git reset --hard add-react-redux
 * Functions that return data from Redux state
 * Must not transform data
 ```js
-  const searchTermSelector = state => state.searchTerm;
+  const searchTermSelector = 
+    state => state.searchTerm;
 ```
 
 --
@@ -934,10 +534,11 @@ git reset --hard add-react-redux
 * Take basic selectors as inputs
 * Return combined state to components
 ```js
-  const caseInsensitiveSearchTermSelector = createSelector(
-    [searchTermSelector],
-    searchTerm => searchTerm.toLowerCase()
-);
+  const caseInsensitiveSearchTermSelector = 
+    createSelector(
+      [searchTermSelector],
+      searchTerm => searchTerm.toLowerCase()
+    );
 ```
 
 --
@@ -945,7 +546,7 @@ git reset --hard add-react-redux
 ### Example
 
 ```js
-const newsSelector = state => state.news;
+const todosSelector = state => state.todos;
 const searchTermSelector = state => state.searchTerm;
 
 const caseInsensitiveSearchTermSelector = createSelector(
@@ -953,26 +554,76 @@ const caseInsensitiveSearchTermSelector = createSelector(
   searchTerm => searchTerm.toLowerCase()
 );
 
-export const searchNewsSelector = createSelector(
-  [newsSelector, caseInsensitiveSearchTermSelector],
-  (newsItems, searchTerm) => {
-    // ...
-    return filteredNews;
+export const searchTodosSelector = createSelector(
+  [todosSelector, caseInsensitiveSearchTermSelector],
+  (todos, searchTerm) => {
+    // <code to filter todos here>
+    return filteredTodos;
   },
 );
 ```
 
---
-
-## Code Along
-```bash
-git reset --hard add-redux-thunk
-```
-1. Install `reselect`
-2. Create news selectors that make it possible to search the news
-3. Pass filtered `news` to `NewsArchive` as props
-
 ---
 
-## Thank you!
+## Recommendations
+
+--
+
+### Organize your code
+
+There's a million patterns to follow. Here's one:
+
+```
+src/
+  components/
+    Todo.js
+    SearchBar.js
+    ...
+  actions/
+    todoActions.js
+    userActions.js
+    ...
+  reducers/
+    todoReducer.js
+    ...
+  store/
+    store.js
+    rootReducer.js
+  App.js
+```
+
+--
+
+### Redux Store
+
+1. Plan your store
+2. Keep data _relatively_ flat (don't overly nest)
+3. When you need to nest data, use `combineReducers`
+4. Don't duplicate data (normalize it!)
+5. Keep your store's data serializable
+
+--
+
+### Async
+#### Decide on a library that works for your team
+
+1. `redux-promsise`: easy but limited
+2. `redux-thunk`: versatile, challenging to write tests for
+3. `redux-sagas`: uses new JavaScript (generators), easy to test
+
+--
+
+### Actions
+
+1. Keep your action constants in a single file
+2. Follow [Flux Standard Actions](https://github.com/acdlite/flux-standard-action)
+
+--
+
+### Final tips
+
+1. Use Reselect for combining state
+2. Keep your React components as dumb as possible
+3. Great resource: http://redux.js.org/
+
 
