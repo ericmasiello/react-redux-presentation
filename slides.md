@@ -3,6 +3,17 @@
 
 ---
 
+## Overview
+1. Why Redux
+2. Redux: single store, actions, reducers
+3. Redux middleware for dev tooling
+4. React-Redux library
+5. Redux middleware for async actions
+6. Selectors with Reselect library
+7. Recommendations
+
+---
+
 ## Managing state in React w/o Redux
 
 --
@@ -35,6 +46,7 @@
 * Can't be used to server-side render React components
 * No single source of truth (multiple component `state`s)
 * Requires `React.createClass` or extending `React.Component`
+* Often leads to tight coupling of presentation and data model
 
 Note:
 * At scale, can be difficult to reason about
@@ -96,7 +108,7 @@ One object. One store.
 ### Synchronous
 
 * Redux only handles synchronous data flow
-* Must apply middleware to work asynchronously (e.g. `redux-thunk`, `redux-promise`, `redux-saga`)
+* Must apply middleware to work asynchronously (e.g. `redux-thunk`, `redux-promise`, `redux-promise-middleware`, `redux-saga`)
 
 --
 
@@ -119,7 +131,7 @@ store.dispatch({ type: 'IS_LOADING' });
 
 store.dispatch({ type: 'DONE_LOADING' })
 
-store.dispatch({ type: 'UPDATE_SEARCH_TERM', payload: 'gener' })
+store.dispatch({ type: 'UPDATE_SEARCH_TERM', payload: 'vistap' })
 
 ```
 *Think of actions as the "breadcrumbs" of what's changed*
@@ -432,6 +444,7 @@ Redux out of the box only works synchronously
 
 ### Example: Dispatching a Promise
 #### Using `redux-promise`
+(Note: **not** `redux-promise-middleware`)
 
 ```js
 function loadTodosFromServer() {
@@ -606,17 +619,20 @@ src/
 
 ### Async
 #### Decide on a library that works for your team
+<small>Start with one but feel free to combine multiple if your project calls for it</small>
 
-1. `redux-promsise`: easy but limited
-2. `redux-thunk`: versatile, challenging to write tests for
-3. `redux-sagas`: uses new JavaScript (generators), easy to test
+1. [`redux-promise`](https://github.com/acdlite/redux-promise): easy but limited
+2. [`redux-promise-middleware`](https://github.com/pburtchaell/redux-promise-middleware): similar to `redux-promise`, also auto-dispatches `*_PENDING`, `*_FULFILLED`, and `*_REJECTED` actions
+3. [`redux-thunk`](https://github.com/gaearon/redux-thunk): versatile, relatively easy to implement, may lead to ugly code
+4. [`redux-sagas`](https://github.com/redux-saga/redux-saga): uses new JavaScript generators, easy to test
+5. [`redux-observable`](https://github.com/redux-observable/redux-observable): based on RxJS 5
 
 --
 
 ### Actions
 
 1. Keep your action constants in a single file
-2. Follow [Flux Standard Actions](https://github.com/acdlite/flux-standard-action)
+2. Follow [Flux Standard Actions](https://github.com/acdlite/flux-standard-action) (aka FSA)
 
 --
 
@@ -625,5 +641,5 @@ src/
 1. Use Reselect for combining state
 2. Keep your React components as dumb as possible
 3. Great resource: http://redux.js.org/
-
+4. If Redux feels like overkill, check out [MobX](https://github.com/mobxjs/mobx)
 
